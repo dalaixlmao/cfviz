@@ -1,37 +1,93 @@
-# Codeforces Visualizer
+# Movie Booking Management App
 
-This is code repository for a simple analytics visualization site for [Codeforces online judge](http://codeforces.com/) users using [Codeforces API](https://codeforces.com/apiHelp). The site is currently hosted at [here](https://cfviz.netlify.com/).
+A comprehensive movie ticket booking application with robust APIs for user authentication, movie browsing, seat selection, booking management, and payment processing.
 
-### Current features
+## Features
 
-#### Single User Analytics
-* Verdicts chart
-* Languages chart
-* Tags chart
-* Levels chart
-* Total tried problems count
-* Total solved problems count
-* Average and max attempts
-* Count of problems solved with one submission
-* Max AC for a single problem (It indicates in how many ways someone solved a problem)
-* List of unsolved problems
+- User authentication and registration
+- Movie catalog browsing and search
+- Screening schedules and theater information
+- Interactive seat selection
+- Secure booking and payment processing
+- Booking history and management
 
-#### Comparison between two users
-* Current, max and min rating
-* Number of contests
-* Best and worst position in contest
-* Max positive and negative rating change
-* Compared rating time-line
-* Total tried problem count compared
-* Total solved problem count compared
-* Average and max attempts compared
-* Count of problems solved with one submission compared
-* Max AC for a single problem compared
-* Tags compared
-* Levels compared
+## API Documentation
 
+The API is documented using OpenAPI 3.0 specification. When the server is running, you can access the Swagger UI documentation at:
 
-#### Issues
-* When somebody searches for a handle that doesn't exists, we get  Cross-Origin Request blocked and the status code becomes 0 in jQuery. So we can't determine if the user doesn't really exists or some other network problem occurs.
-* Firefox hangs for a while when drawing the tags comparison chart. Probably because it's big. I have plan to divide that chart in two parts.
-* When counting number of solved problems, some problems that appear both on div 1 and div 2  get counted twice.
+```
+http://localhost:3000/api-docs
+```
+
+## Project Structure
+
+```
+├── server/              # Server-side code
+│   ├── server.js        # Express application entry point
+│   ├── openapi.yml      # API specification
+│   └── package.json     # Server dependencies
+├── tests/               # Testing directory
+│   ├── api.test.js      # API unit tests
+│   ├── contract/        # Contract testing (Dredd)
+│   └── performance/     # Performance testing (k6)
+└── reports.codexhub.ai/ # Test reports and analysis
+```
+
+## Getting Started
+
+### Prerequisites
+
+- Node.js (v14+)
+- MongoDB
+- npm or yarn
+
+### Installation
+
+1. Clone the repository
+2. Install dependencies:
+
+```bash
+# Install server dependencies
+cd server
+npm install
+
+# Install testing dependencies (in root directory)
+cd ..
+npm install
+```
+
+### Running the Server
+
+```bash
+cd server
+npm start
+```
+
+The server will start on http://localhost:3000 by default.
+
+### Running Tests
+
+```bash
+# Run API tests
+npm run test-api
+
+# Run contract tests
+npm run test-contract
+
+# Run load tests for authentication
+npm run test-load-auth
+
+# Run load tests for booking flow
+npm run test-load-booking
+
+# Run all tests
+npm test
+```
+
+## Test Reports
+
+Comprehensive test reports are available in the `reports.codexhub.ai` directory.
+
+## License
+
+This project is licensed under the MIT License - see the LICENSE file for details.

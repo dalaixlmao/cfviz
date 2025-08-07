@@ -1,0 +1,26 @@
+dry-run: false
+hookfiles: ./tests/contract/dredd-hooks.js
+language: nodejs
+require: []
+server: node ./server/server.js
+server-wait: 3
+init: false
+custom:
+  apiaryApiKey: ''
+names: false
+only: []
+reporter: apiary
+output: []
+header: []
+sorted: false
+user: ''
+inline-errors: false
+details: false
+method: []
+color: true
+level: info
+timestamp: false
+silent: false
+path: []
+blueprint: ./server/openapi.yml
+endpoint: 'http://localhost:3000'

@@ -1,0 +1,19 @@
+{
+  "name": "movie-booking-app-tests",
+  "version": "1.0.0",
+  "description": "Testing suite for Movie Booking Management App",
+  "scripts": {
+    "start-server": "cd server && npm start",
+    "test-contract": "dredd",
+    "test-api": "jest ./tests/api.test.js",
+    "test-load-auth": "k6 run ./tests/performance/auth_load.js",
+    "test-load-booking": "k6 run ./tests/performance/booking_flow.js",
+    "test": "npm run test-api && npm run test-contract && npm run test-load"
+  },
+  "devDependencies": {
+    "jest": "^29.6.4",
+    "supertest": "^6.3.3",
+    "dredd": "^14.1.0",
+    "mongodb-memory-server": "^8.15.1"
+  }
+}
