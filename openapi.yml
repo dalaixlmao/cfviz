@@ -1,0 +1,583 @@
+openapi: 3.0.0
+info:
+  title: Movie Booking API
+  description: API for movie ticket booking management
+  version: 1.0.0
+servers:
+  - url: http://localhost:3000
+    description: Development server
+paths:
+  /api/auth/register:
+    post:
+      summary: Register a new user
+      tags:
+        - Authentication
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/UserRegistration'
+      responses:
+        '201':
+          description: User registered successfully
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  message:
+                    type: string
+                    example: User registered successfully
+        '400':
+          description: Bad request (e.g., user already exists)
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+  /api/auth/login:
+    post:
+      summary: Login user
+      tags:
+        - Authentication
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/UserLogin'
+      responses:
+        '200':
+          description: Login successful
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  token:
+                    type: string
+                    example: eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9...
+                  userId:
+                    type: string
+                    example: 5f8d0b3a1c9d440000b9e48a
+                  role:
+                    type: string
+                    example: user
+        '401':
+          description: Invalid credentials
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+  /api/movies:
+    get:
+      summary: Get all active movies
+      tags:
+        - Movies
+      responses:
+        '200':
+          description: List of movies
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/Movie'
+    post:
+      summary: Add a new movie
+      tags:
+        - Movies
+      security:
+        - bearerAuth: []
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/MovieInput'
+      responses:
+        '201':
+          description: Movie created successfully
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Movie'
+        '401':
+          description: Unauthorized
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+        '403':
+          description: Forbidden (not an admin)
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+  /api/movies/{id}:
+    get:
+      summary: Get movie by ID
+      tags:
+        - Movies
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: string
+      responses:
+        '200':
+          description: Movie details
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Movie'
+        '404':
+          description: Movie not found
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+  /api/screenings:
+    get:
+      summary: Get all screenings
+      tags:
+        - Screenings
+      responses:
+        '200':
+          description: List of screenings
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/Screening'
+    post:
+      summary: Add a new screening
+      tags:
+        - Screenings
+      security:
+        - bearerAuth: []
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/ScreeningInput'
+      responses:
+        '201':
+          description: Screening created successfully
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Screening'
+        '401':
+          description: Unauthorized
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+        '403':
+          description: Forbidden (not an admin)
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+  /api/screenings/movie/{movieId}:
+    get:
+      summary: Get screenings by movie ID
+      tags:
+        - Screenings
+      parameters:
+        - name: movieId
+          in: path
+          required: true
+          schema:
+            type: string
+      responses:
+        '200':
+          description: List of screenings for the movie
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/Screening'
+  /api/bookings:
+    post:
+      summary: Create a new booking
+      tags:
+        - Bookings
+      security:
+        - bearerAuth: []
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/BookingInput'
+      responses:
+        '201':
+          description: Booking created successfully
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Booking'
+        '400':
+          description: Bad request (e.g., not enough seats available)
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+        '401':
+          description: Unauthorized
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+  /api/bookings/{id}/payment:
+    post:
+      summary: Process payment for a booking
+      tags:
+        - Bookings
+      security:
+        - bearerAuth: []
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: string
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/PaymentInput'
+      responses:
+        '200':
+          description: Payment processed successfully
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  message:
+                    type: string
+                    example: Payment processed successfully
+                  booking:
+                    $ref: '#/components/schemas/Booking'
+        '400':
+          description: Bad request
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+        '401':
+          description: Unauthorized
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+        '403':
+          description: Forbidden (not the booking owner)
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+  /api/bookings/user:
+    get:
+      summary: Get all bookings for authenticated user
+      tags:
+        - Bookings
+      security:
+        - bearerAuth: []
+      responses:
+        '200':
+          description: List of user's bookings
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/BookingDetails'
+        '401':
+          description: Unauthorized
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+components:
+  securitySchemes:
+    bearerAuth:
+      type: http
+      scheme: bearer
+      bearerFormat: JWT
+  schemas:
+    UserRegistration:
+      type: object
+      required:
+        - username
+        - email
+        - password
+      properties:
+        username:
+          type: string
+          example: johndoe
+        email:
+          type: string
+          format: email
+          example: john@example.com
+        password:
+          type: string
+          format: password
+          example: securePassword123
+    UserLogin:
+      type: object
+      required:
+        - username
+        - password
+      properties:
+        username:
+          type: string
+          example: johndoe
+        password:
+          type: string
+          format: password
+          example: securePassword123
+    Movie:
+      type: object
+      properties:
+        _id:
+          type: string
+          example: 5f8d0b3a1c9d440000b9e48a
+        title:
+          type: string
+          example: The Matrix
+        description:
+          type: string
+          example: A computer hacker learns about the true nature of reality
+        duration:
+          type: number
+          example: 136
+        genre:
+          type: array
+          items:
+            type: string
+          example: ["Action", "Sci-Fi"]
+        releaseDate:
+          type: string
+          format: date
+          example: 1999-03-31
+        poster:
+          type: string
+          example: https://example.com/posters/matrix.jpg
+        rating:
+          type: number
+          example: 8.7
+        isActive:
+          type: boolean
+          example: true
+    MovieInput:
+      type: object
+      required:
+        - title
+        - description
+        - duration
+        - genre
+        - releaseDate
+        - poster
+      properties:
+        title:
+          type: string
+          example: The Matrix
+        description:
+          type: string
+          example: A computer hacker learns about the true nature of reality
+        duration:
+          type: number
+          example: 136
+        genre:
+          type: array
+          items:
+            type: string
+          example: ["Action", "Sci-Fi"]
+        releaseDate:
+          type: string
+          format: date
+          example: 1999-03-31
+        poster:
+          type: string
+          example: https://example.com/posters/matrix.jpg
+        isActive:
+          type: boolean
+          example: true
+    Screening:
+      type: object
+      properties:
+        _id:
+          type: string
+          example: 5f8d0b3a1c9d440000b9e48b
+        movieId:
+          type: object
+          properties:
+            _id:
+              type: string
+              example: 5f8d0b3a1c9d440000b9e48a
+            title:
+              type: string
+              example: The Matrix
+        startTime:
+          type: string
+          format: date-time
+          example: 2025-08-15T18:00:00Z
+        endTime:
+          type: string
+          format: date-time
+          example: 2025-08-15T20:16:00Z
+        theater:
+          type: string
+          example: Screen 1
+        capacity:
+          type: number
+          example: 150
+        availableSeats:
+          type: number
+          example: 120
+        price:
+          type: number
+          example: 12.50
+    ScreeningInput:
+      type: object
+      required:
+        - movieId
+        - startTime
+        - endTime
+        - theater
+        - capacity
+        - availableSeats
+        - price
+      properties:
+        movieId:
+          type: string
+          example: 5f8d0b3a1c9d440000b9e48a
+        startTime:
+          type: string
+          format: date-time
+          example: 2025-08-15T18:00:00Z
+        endTime:
+          type: string
+          format: date-time
+          example: 2025-08-15T20:16:00Z
+        theater:
+          type: string
+          example: Screen 1
+        capacity:
+          type: number
+          example: 150
+        availableSeats:
+          type: number
+          example: 150
+        price:
+          type: number
+          example: 12.50
+    Booking:
+      type: object
+      properties:
+        _id:
+          type: string
+          example: 5f8d0b3a1c9d440000b9e48c
+        userId:
+          type: string
+          example: 5f8d0b3a1c9d440000b9e48d
+        screeningId:
+          type: string
+          example: 5f8d0b3a1c9d440000b9e48b
+        seats:
+          type: array
+          items:
+            type: string
+          example: ["A1", "A2"]
+        totalAmount:
+          type: number
+          example: 25.00
+        paymentStatus:
+          type: string
+          enum: [pending, completed, failed]
+          example: pending
+        bookingTime:
+          type: string
+          format: date-time
+          example: 2025-08-01T14:30:00Z
+    BookingInput:
+      type: object
+      required:
+        - screeningId
+        - seats
+      properties:
+        screeningId:
+          type: string
+          example: 5f8d0b3a1c9d440000b9e48b
+        seats:
+          type: array
+          items:
+            type: string
+          example: ["A1", "A2"]
+    BookingDetails:
+      type: object
+      properties:
+        _id:
+          type: string
+          example: 5f8d0b3a1c9d440000b9e48c
+        userId:
+          type: string
+          example: 5f8d0b3a1c9d440000b9e48d
+        screeningId:
+          $ref: '#/components/schemas/Screening'
+        movie:
+          $ref: '#/components/schemas/Movie'
+        seats:
+          type: array
+          items:
+            type: string
+          example: ["A1", "A2"]
+        totalAmount:
+          type: number
+          example: 25.00
+        paymentStatus:
+          type: string
+          enum: [pending, completed, failed]
+          example: pending
+        bookingTime:
+          type: string
+          format: date-time
+          example: 2025-08-01T14:30:00Z
+    PaymentInput:
+      type: object
+      required:
+        - paymentMethod
+      properties:
+        paymentMethod:
+          type: string
+          example: credit_card
+        cardDetails:
+          type: object
+          properties:
+            number:
+              type: string
+              example: "xxxx-xxxx-xxxx-1234"
+            expiryMonth:
+              type: string
+              example: "09"
+            expiryYear:
+              type: string
+              example: "26"
+            cvv:
+              type: string
+              example: "***"
+    Error:
+      type: object
+      properties:
+        message:
+          type: string
+          example: Something went wrong

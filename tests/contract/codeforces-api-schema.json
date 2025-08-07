@@ -1,0 +1,280 @@
+{
+  "openapi": "3.0.0",
+  "info": {
+    "title": "Codeforces API",
+    "description": "API for accessing Codeforces programming contests data",
+    "version": "1.0.0"
+  },
+  "servers": [
+    {
+      "url": "https://codeforces.com/api"
+    }
+  ],
+  "paths": {
+    "/user.status": {
+      "get": {
+        "summary": "Returns submissions of specified user",
+        "description": "Returns a list of all user's submissions",
+        "parameters": [
+          {
+            "name": "handle",
+            "in": "query",
+            "required": true,
+            "schema": {
+              "type": "string"
+            },
+            "description": "Codeforces user handle"
+          },
+          {
+            "name": "from",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "type": "integer",
+              "format": "int32"
+            },
+            "description": "1-based index of the first submission to return"
+          },
+          {
+            "name": "count",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "type": "integer",
+              "format": "int32"
+            },
+            "description": "Number of submissions to return"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Successful operation",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "status": {
+                      "type": "string",
+                      "enum": ["OK", "FAILED"]
+                    },
+                    "result": {
+                      "type": "array",
+                      "items": {
+                        "$ref": "#/components/schemas/Submission"
+                      }
+                    }
+                  }
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/user.rating": {
+      "get": {
+        "summary": "Returns rating history of the specified user",
+        "description": "Returns rating history of the specified user",
+        "parameters": [
+          {
+            "name": "handle",
+            "in": "query",
+            "required": true,
+            "schema": {
+              "type": "string"
+            },
+            "description": "Codeforces user handle"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Successful operation",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "status": {
+                      "type": "string",
+                      "enum": ["OK", "FAILED"]
+                    },
+                    "result": {
+                      "type": "array",
+                      "items": {
+                        "$ref": "#/components/schemas/RatingChange"
+                      }
+                    }
+                  }
+                }
+              }
+            }
+          }
+        }
+      }
+    }
+  },
+  "components": {
+    "schemas": {
+      "Problem": {
+        "type": "object",
+        "properties": {
+          "contestId": {
+            "type": "integer",
+            "format": "int32"
+          },
+          "problemsetName": {
+            "type": "string"
+          },
+          "index": {
+            "type": "string"
+          },
+          "name": {
+            "type": "string"
+          },
+          "type": {
+            "type": "string",
+            "enum": ["PROGRAMMING", "QUESTION"]
+          },
+          "points": {
+            "type": "number",
+            "format": "float"
+          },
+          "rating": {
+            "type": "integer",
+            "format": "int32"
+          },
+          "tags": {
+            "type": "array",
+            "items": {
+              "type": "string"
+            }
+          }
+        }
+      },
+      "Submission": {
+        "type": "object",
+        "properties": {
+          "id": {
+            "type": "integer",
+            "format": "int64"
+          },
+          "contestId": {
+            "type": "integer",
+            "format": "int32"
+          },
+          "creationTimeSeconds": {
+            "type": "integer",
+            "format": "int64"
+          },
+          "relativeTimeSeconds": {
+            "type": "integer",
+            "format": "int32"
+          },
+          "problem": {
+            "$ref": "#/components/schemas/Problem"
+          },
+          "author": {
+            "$ref": "#/components/schemas/Party"
+          },
+          "programmingLanguage": {
+            "type": "string"
+          },
+          "verdict": {
+            "type": "string"
+          },
+          "testset": {
+            "type": "string"
+          },
+          "passedTestCount": {
+            "type": "integer",
+            "format": "int32"
+          },
+          "timeConsumedMillis": {
+            "type": "integer",
+            "format": "int32"
+          },
+          "memoryConsumedBytes": {
+            "type": "integer",
+            "format": "int32"
+          }
+        }
+      },
+      "Party": {
+        "type": "object",
+        "properties": {
+          "contestId": {
+            "type": "integer",
+            "format": "int32"
+          },
+          "members": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/Member"
+            }
+          },
+          "participantType": {
+            "type": "string"
+          },
+          "teamId": {
+            "type": "integer",
+            "format": "int32"
+          },
+          "teamName": {
+            "type": "string"
+          },
+          "ghost": {
+            "type": "boolean"
+          },
+          "room": {
+            "type": "integer",
+            "format": "int32"
+          },
+          "startTimeSeconds": {
+            "type": "integer",
+            "format": "int64"
+          }
+        }
+      },
+      "Member": {
+        "type": "object",
+        "properties": {
+          "handle": {
+            "type": "string"
+          }
+        }
+      },
+      "RatingChange": {
+        "type": "object",
+        "properties": {
+          "contestId": {
+            "type": "integer",
+            "format": "int32"
+          },
+          "contestName": {
+            "type": "string"
+          },
+          "handle": {
+            "type": "string"
+          },
+          "rank": {
+            "type": "integer",
+            "format": "int32"
+          },
+          "ratingUpdateTimeSeconds": {
+            "type": "integer",
+            "format": "int64"
+          },
+          "oldRating": {
+            "type": "integer",
+            "format": "int32"
+          },
+          "newRating": {
+            "type": "integer",
+            "format": "int32"
+          }
+        }
+      }
+    }
+  }
+}

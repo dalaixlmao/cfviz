@@ -1,0 +1,20 @@
+#!/usr/bin/env node
+
+// Ignore this block, it's pure magic, temporary fix
+// for https://github.com/nodejs/node/issues/6456
+[process.stdout, process.stderr].forEach((s) => {
+  if (s && s.isTTY && s._handle && s._handle.setBlocking) {
+    s._handle.setBlocking(true);
+  }
+});
+
+const CLI = require('../build/CLI').default;
+
+const dreddCli = new CLI({
+  custom: {
+    cwd: process.cwd(),
+    argv: process.argv.slice(2),
+  },
+});
+
+dreddCli.run();
